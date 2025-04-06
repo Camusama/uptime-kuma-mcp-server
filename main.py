@@ -1,16 +1,19 @@
 from uptime_kuma_api import UptimeKumaApi, MonitorType
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
-api = UptimeKumaApi("https://kuma2.896324.xyz:3306")
-api.login("marquezyang", "kuma123")
+api = UptimeKumaApi(os.getenv("KUMA_URL"))
+api.login(os.getenv("KUMA_USERNAME"), os.getenv("KUMA_PASSWORD"))
 
-result = api.add_monitor(type=MonitorType.HTTP, name="Google", url="https://google.com")
+result = api.add_monitor(type=MonitorType.HTTP, name="Bing", url="https://bing.com")
 print(result)
 
 
-def main():
-    print("Hello from uptime-kuma-mcp-server!")
+# def main():
+#     print("Hello from uptime-kuma-mcp-server!")
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
