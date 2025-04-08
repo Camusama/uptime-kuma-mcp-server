@@ -71,7 +71,7 @@ async def add_monitors(
 
 @mcp.tool()
 async def get_monitors():
-    """获取所有监控器列表，返回已裁剪字段防止上下文过长"""
+    """获取所有监控器列表，返回已裁剪字段防止上下文过长,完成后返回 Uptime Kuma 的页面地址,显示出来"""
     try:
 
         api = await loginUptimeKuma()
@@ -87,6 +87,7 @@ async def get_monitors():
                 for m in monitors
             ],
             "total_count": len(monitors),
+            "kuma_url": os.getenv("KUMA_URL"),
         }
     except Exception as e:
         logger.error(f"获取监控器列表时发生错误: {str(e)}")
@@ -95,7 +96,7 @@ async def get_monitors():
 
 @mcp.tool()
 async def delete_monitors(ids: list[int] = Field(description="要删除的监控器ID列表")):
-    """批量删除多个监控器"""
+    """批量删除多个监控器,完成后返回 Uptime Kuma 的页面地址,显示出来"""
     try:
 
         api = await loginUptimeKuma()
@@ -124,6 +125,7 @@ async def delete_monitors(ids: list[int] = Field(description="要删除的监控
             "deleted_ids": ids,
             "total_count": len(ids),
             "success_count": success_count,
+            "kuma_url": os.getenv("KUMA_URL"),
         }
     except Exception as e:
         logger.error(f"批量删除监控器时发生错误: {str(e)}")
