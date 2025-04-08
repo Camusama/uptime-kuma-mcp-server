@@ -4,14 +4,4 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = [
-    "dotenv>=0.9.9",
-    "httpx>=0.28.1",
-    "markdownify>=1.1.0",
-    "mcp>=1.6.0",
-    "protego>=0.4.0",
-    "pydantic>=2.11.2",
-    "readabilipy>=0.3.0",
-    "requests>=2.32.3",
-    "uptime-kuma-api>=1.2.1",
-]
+dependencies = ["dotenv>=0.9.9", "mcp[cli]>=1.6.0", "uptime-kuma-api>=1.2.1"]
