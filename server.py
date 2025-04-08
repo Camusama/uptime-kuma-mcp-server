@@ -4,6 +4,7 @@ from uptime_kuma_api import UptimeKumaApi, MonitorType
 import os
 import asyncio
 from dotenv import load_dotenv
+import logging
 
 load_dotenv()
 
@@ -18,19 +19,12 @@ async def loginUptimeKuma():
 mcp = FastMCP("UptimeKumaMcpServer")
 
 
-@mcp.tool()
-async def add_monitor(
-    name: str = Field(description="监控名称,从URL名称中获取或推断"),
-    url: str = Field(description="监控URL,必须包含完整协议(如https://bing.com)"),
-):
-    """添加单个监控到 Uptime Kuma"""
-    api = await loginUptimeKuma()
-    response = api.add_monitor(type=MonitorType.HTTP, name=name, url=url)
-    return {
-        "monitor_response": response,
-        "kuma_url": os.getenv("KUMA_URL"),
-        "kuma_username": os.getenv("KUMA_USERNAME"),
-    }
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.StreamHandler()],
+)
+logger = logging.getLogger(__name__)
 
 
 @mcp.tool()
@@ -39,74 +33,101 @@ async def add_monitors(
         description="监控URL列表,需要去重,且必须包含完整协议(如https://bing.com)"
     ),
 ):
-    """批量添加多个监控器到Uptime Kuma"""
-    api = await loginUptimeKuma()
+    """批量添加多个监控器到Uptime Kuma,添加完成后返回 Uptime Kuma 的页面地址,显示出来"""
+    try:
+        api = await loginUptimeKuma()
 
-    def add_single_monitor(url):
-        name = url.split("//")[-1].split("/")[0]
-        return api.add_monitor(type=MonitorType.HTTP, name=name, url=url)
+        def add_single_monitor(url):
+            try:
+                name = url.split("//")[-1].split("/")[0]
+                logger.info(f"正在添加监控器: {name} ({url})")
+                response = api.add_monitor(type=MonitorType.HTTP, name=name, url=url)
+                logger.info(f"成功添加监控器: {name} ({url})")
+                return response
+            except Exception as e:
+                logger.error(f"添加监控器 {url} 时出错: {str(e)}")
+                return {"ok": False, "error": str(e)}
 
-    loop = asyncio.get_event_loop()
-    tasks = []
-    for url in urls:
-        tasks.append(loop.run_in_executor(None, add_single_monitor, url))
+        loop = asyncio.get_event_loop()
+        tasks = []
+        for url in urls:
+            tasks.append(loop.run_in_executor(None, add_single_monitor, url))
 
-    responses = await asyncio.gather(*tasks)
+        responses = await asyncio.gather(*tasks)
+        success_count = len([r for r in responses if r.get("ok")])
+        logger.info(f"批量添加完成，成功数: {success_count}/{len(urls)}")
 
-    return {
-        "monitor_responses": responses,
-        "kuma_url": os.getenv("KUMA_URL"),
-        "kuma_username": os.getenv("KUMA_USERNAME"),
-        "total_count": len(urls),
-        "success_count": len([r for r in responses if r.get("ok")]),
-    }
+        return {
+            "monitor_responses": responses,
+            "kuma_url": os.getenv("KUMA_URL"),
+            "kuma_username": os.getenv("KUMA_USERNAME"),
+            "total_count": len(urls),
+            "success_count": success_count,
+        }
+    except Exception as e:
+        logger.error(f"批量添加监控器时发生错误: {str(e)}")
+        raise
 
 
 @mcp.tool()
 async def get_monitors():
-    """获取所有监控器列表"""
-    api = await loginUptimeKuma()
-    monitors = api.get_monitors()
-    return {
-        "monitors": monitors,
-        "total_count": len(monitors),
-    }
+    """获取所有监控器列表，返回已裁剪字段防止上下文过长"""
+    try:
 
-
-@mcp.tool()
-async def delete_monitor(id_: int = Field(description="要删除的监控器ID")):
-    """删除指定监控器"""
-    api = await loginUptimeKuma()
-    response = api.delete_monitor(id_)
-    return {
-        "delete_response": response,
-        "deleted_id": id_,
-    }
+        api = await loginUptimeKuma()
+        monitors = api.get_monitors()
+        return {
+            "monitors": [
+                {
+                    "id": m["id"],
+                    "url": m["url"],
+                    "type": m["type"],
+                    "active": m["active"],
+                }
+                for m in monitors
+            ],
+            "total_count": len(monitors),
+        }
+    except Exception as e:
+        logger.error(f"获取监控器列表时发生错误: {str(e)}")
+        raise
 
 
 @mcp.tool()
 async def delete_monitors(ids: list[int] = Field(description="要删除的监控器ID列表")):
     """批量删除多个监控器"""
-    api = await loginUptimeKuma()
+    try:
 
-    def delete_single_monitor(id_):
-        return api.delete_monitor(id_)
+        api = await loginUptimeKuma()
 
-    loop = asyncio.get_event_loop()
-    tasks = []
-    for id_ in ids:
-        tasks.append(loop.run_in_executor(None, delete_single_monitor, id_))
+        def delete_single_monitor(id_):
+            try:
+                response = api.delete_monitor(id_)
+                return response
+            except Exception as e:
+                logger.error(f"删除监控器 {id_} 时出错: {str(e)}")
+                return {"msg": f"Error: {str(e)}"}
 
-    responses = await asyncio.gather(*tasks)
+        loop = asyncio.get_event_loop()
+        tasks = []
+        for id_ in ids:
+            tasks.append(loop.run_in_executor(None, delete_single_monitor, id_))
 
-    return {
-        "delete_responses": responses,
-        "deleted_ids": ids,
-        "total_count": len(ids),
-        "success_count": len(
+        responses = await asyncio.gather(*tasks)
+        success_count = len(
             [r for r in responses if r.get("msg") == "Deleted Successfully."]
-        ),
-    }
+        )
+        logger.info(f"批量删除完成，成功数: {success_count}/{len(ids)}")
+
+        return {
+            "delete_responses": responses,
+            "deleted_ids": ids,
+            "total_count": len(ids),
+            "success_count": success_count,
+        }
+    except Exception as e:
+        logger.error(f"批量删除监控器时发生错误: {str(e)}")
+        raise
 
 
 if __name__ == "__main__":
