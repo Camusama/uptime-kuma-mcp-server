@@ -133,5 +133,9 @@ async def delete_monitors(ids: list[int] = Field(description="要删除的监控
         raise
 
 
-if __name__ == "__main__":
+def main():
     mcp.run(transport="stdio")
+
+
+if __name__ == "__main__":
+    main()

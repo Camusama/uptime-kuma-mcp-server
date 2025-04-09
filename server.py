@@ -41,7 +41,8 @@ async def add_monitors(
             try:
                 name = url.split("//")[-1].split("/")[0]
                 logger.info(f"正在添加监控器: {name} ({url})")
-                response = api.add_monitor(type=MonitorType.HTTP, name=name, url=url)
+                response = api.add_monitor(
+                    type=MonitorType.HTTP, name=name, url=url)
                 logger.info(f"成功添加监控器: {name} ({url})")
                 return response
             except Exception as e:
@@ -112,7 +113,8 @@ async def delete_monitors(ids: list[int] = Field(description="要删除的监控
         loop = asyncio.get_event_loop()
         tasks = []
         for id_ in ids:
-            tasks.append(loop.run_in_executor(None, delete_single_monitor, id_))
+            tasks.append(loop.run_in_executor(
+                None, delete_single_monitor, id_))
 
         responses = await asyncio.gather(*tasks)
         success_count = len(
