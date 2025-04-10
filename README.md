@@ -5,5 +5,22 @@ A server for managing Uptime Kuma monitors via MCP protocol.
 ## Installation
 
 ```bash
-pip install uptime-kuma-mcp-server
+uvx uptime-kuma-mcp-server
+```
+
+```bash
+"mcpServers": {
+  "uptime-kuma-mcp-server": {
+    "command": "uvx",
+    "args": ["uptime-kuma-mcp-server"]
+  }
+}
+```
+
+## .env
+
+```bash
+KUMA_URL=https://kuma.yourdomain.com
+KUMA_USERNAME=marquezyang
+KUMA_PASSWORD=yourpassowrd
 ```
