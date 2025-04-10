@@ -1,6 +1,6 @@
 [project]
 name = "uptime-kuma-mcp-server"
-version = "0.1.10"
+version = "0.1.11"
 description = "Uptime Kuma MCP Server for managing monitors"
 readme = "README.md"
 requires-python = ">=3.10"
