@@ -6,6 +6,13 @@ readme = "README.md"
 requires-python = ">=3.10"
 authors = [{ name = "Marquez Yang", email = "marquez.yang@foxmail.com" }]
 license = { text = "MIT" }
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+]
 dependencies = [
   "python-dotenv>=0.9.9",
   "mcp[cli]>=1.6.0",
@@ -24,3 +31,6 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
+
+[tool.uv]
+dev-dependencies = ["bump2version>=1.0.1"]
