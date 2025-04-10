@@ -8,12 +8,17 @@ A server for managing Uptime Kuma monitors via MCP protocol.
 uvx uptime-kuma-mcp-server
 ```
 
-```bash
+```json
 "mcpServers": {
   "uptime-kuma-mcp-server": {
     "command": "uvx",
-    "args": ["uptime-kuma-mcp-server"]
-  }
+    "args": ["uptime-kuma-mcp-server"],
+    "env": {
+      "KUMA_URL": "https://yourdomain.xyz",
+      "KUMA_USERNAME": "username",
+      "KUMA_PASSWORD": "passwd"
+    }
+  },
 }
 ```
 
