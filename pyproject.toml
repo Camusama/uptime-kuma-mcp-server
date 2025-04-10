@@ -1,6 +1,6 @@
 [project]
 name = "uptime-kuma-mcp-server"
-version = "0.1.6"
+version = "0.1.7"
 description = "Uptime Kuma MCP Server for managing monitors"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -16,7 +16,7 @@ dependencies = [
 Homepage = "https://github.com/camusama/uptime-kuma-mcp-server"
 
 [project.scripts]
-uptime-kuma-mcp = "src.uptime_kuma_mcp_server.server:main"
+uptime-kuma-mcp-server = "src.uptime_kuma_mcp_server.server:main"
 
 [build-system]
 requires = ["hatchling"]
