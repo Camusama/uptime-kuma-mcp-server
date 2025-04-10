@@ -22,10 +22,10 @@ uvx uptime-kuma-mcp-server
 }
 ```
 
-## .env
+### Available Tools
 
-```bash
-KUMA_URL=https://kuma.yourdomain.com
-KUMA_USERNAME=marquezyang
-KUMA_PASSWORD=yourpassowrd
-```
+- `add_monitors` - Batch add multiple monitors to Uptime Kuma, returns Uptime Kuma page URLs after completion
+  - `urls` (list[str], required): List of monitor URLs (must be deduplicated and include full protocol, e.g. https://bing.com)
+- `get_monitors` - Get all monitors list, returns trimmed fields to prevent context overflow
+- `delete_monitors` - Batch delete multiple monitors
+  - `ids` (list[int], required): List of monitor IDs to delete
