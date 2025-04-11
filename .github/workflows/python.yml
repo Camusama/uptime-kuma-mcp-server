@@ -19,7 +19,7 @@ jobs:
         run: uv sync --frozen --all-extras --dev
 
       - name: Run tests
-        run: python -m pytest tests/
+        run: uv run pytest tests/ -v
 
       - name: Build package
         run: uv build
