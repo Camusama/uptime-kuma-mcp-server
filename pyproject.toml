@@ -33,4 +33,4 @@ build-backend = "hatchling.build"
 packages = ["src/uptime_kuma_mcp_server"]
 
 [tool.uv]
-dev-dependencies = ["bump2version>=1.0.1"]
+dev-dependencies = ["bump2version>=1.0.1", "pytest>=7.0.0"]
