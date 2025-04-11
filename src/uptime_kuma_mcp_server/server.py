@@ -11,7 +11,7 @@ load_dotenv()
 
 
 async def loginUptimeKuma():
-    """登录 Uptime Kuma API"""
+    """Login to Uptime Kuma API"""
     api = UptimeKumaApi(os.getenv("KUMA_URL"))
     api.login(os.getenv("KUMA_USERNAME"), os.getenv("KUMA_PASSWORD"))
     return api
@@ -31,22 +31,22 @@ logger = logging.getLogger(__name__)
 @mcp.tool()
 async def add_monitors(
     urls: list[str] = Field(
-        description="监控URL列表,需要去重,且必须包含完整协议(如https://bing.com)"
+        description="List of monitoring URLs, must be deduplicated and include full protocol (e.g. https://bing.com)"
     ),
 ):
-    """批量添加多个监控器到Uptime Kuma,添加完成后返回 Uptime Kuma 的页面地址,显示出来"""
+    """Batch add multiple monitors to Uptime Kuma, returns Uptime Kuma page URL after completion"""
     try:
         api = await loginUptimeKuma()
 
         def add_single_monitor(url):
             try:
                 name = url.split("//")[-1].split("/")[0]
-                logger.info(f"正在添加监控器: {name} ({url})")
+                logger.info(f"Adding monitor: {name} ({url})")
                 response = api.add_monitor(type=MonitorType.HTTP, name=name, url=url)
-                logger.info(f"成功添加监控器: {name} ({url})")
+                logger.info(f"Successfully added monitor: {name} ({url})")
                 return response
             except Exception as e:
-                logger.error(f"添加监控器 {url} 时出错: {str(e)}")
+                logger.error(f"Error adding monitor {url}: {str(e)}")
                 return {"ok": False, "error": str(e)}
 
         loop = asyncio.get_event_loop()
@@ -56,7 +56,7 @@ async def add_monitors(
 
         responses = await asyncio.gather(*tasks)
         success_count = len([r for r in responses if r.get("ok")])
-        logger.info(f"批量添加完成，成功数: {success_count}/{len(urls)}")
+        logger.info(f"Batch addition completed, success count: {success_count}/{len(urls)}")
 
         return {
             "monitor_responses": responses,
@@ -66,15 +66,14 @@ async def add_monitors(
             "success_count": success_count,
         }
     except Exception as e:
-        logger.error(f"批量添加监控器时发生错误: {str(e)}")
+        logger.error(f"Error occurred during batch monitor addition: {str(e)}")
         raise
 
 
 @mcp.tool()
 async def get_monitors():
-    """获取所有监控器列表，返回已裁剪字段防止上下文过长,完成后返回 Uptime Kuma 的页面地址,显示出来"""
+    """Get all monitors list, returns trimmed fields to prevent long context, returns Uptime Kuma page URL after completion"""
     try:
-
         api = await loginUptimeKuma()
         monitors = api.get_monitors()
         return {
@@ -91,15 +90,14 @@ async def get_monitors():
             "kuma_url": os.getenv("KUMA_URL"),
         }
     except Exception as e:
-        logger.error(f"获取监控器列表时发生错误: {str(e)}")
+        logger.error(f"Error occurred while getting monitor list: {str(e)}")
         raise
 
 
 @mcp.tool()
-async def delete_monitors(ids: list[int] = Field(description="要删除的监控器ID列表")):
-    """批量删除多个监控器,完成后返回 Uptime Kuma 的页面地址,显示出来"""
+async def delete_monitors(ids: list[int] = Field(description="List of monitor IDs to delete")):
+    """Batch delete multiple monitors, returns Uptime Kuma page URL after completion"""
     try:
-
         api = await loginUptimeKuma()
 
         def delete_single_monitor(id_):
@@ -107,7 +105,7 @@ async def delete_monitors(ids: list[int] = Field(description="要删除的监控
                 response = api.delete_monitor(id_)
                 return response
             except Exception as e:
-                logger.error(f"删除监控器 {id_} 时出错: {str(e)}")
+                logger.error(f"Error deleting monitor {id_}: {str(e)}")
                 return {"msg": f"Error: {str(e)}"}
 
         loop = asyncio.get_event_loop()
@@ -119,7 +117,7 @@ async def delete_monitors(ids: list[int] = Field(description="要删除的监控
         success_count = len(
             [r for r in responses if r.get("msg") == "Deleted Successfully."]
         )
-        logger.info(f"批量删除完成，成功数: {success_count}/{len(ids)}")
+        logger.info(f"Batch deletion completed, success count: {success_count}/{len(ids)}")
 
         return {
             "delete_responses": responses,
@@ -129,7 +127,7 @@ async def delete_monitors(ids: list[int] = Field(description="要删除的监控
             "kuma_url": os.getenv("KUMA_URL"),
         }
     except Exception as e:
-        logger.error(f"批量删除监控器时发生错误: {str(e)}")
+        logger.error(f"Error occurred during batch monitor deletion: {str(e)}")
         raise
 
 
