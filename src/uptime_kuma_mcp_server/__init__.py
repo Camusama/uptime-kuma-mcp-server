@@ -1,7 +1,3 @@
-"""Uptime Kuma MCP Server for managing monitors"""
+from .server import main, run_sse
 
-from src.uptime_kuma_mcp_server.server import main
-
-
-if __name__ == "__main__":
-    main()
+__all__ = ["run_sse", "main"]

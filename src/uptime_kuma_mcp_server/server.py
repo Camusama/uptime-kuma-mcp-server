@@ -137,5 +137,9 @@ def main():
     mcp.run(transport="stdio")
 
 
+def run_sse():
+    mcp.run(transport="sse")
+
+
 if __name__ == "__main__":
     main()
