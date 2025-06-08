@@ -32,6 +32,16 @@ uvx uptime-kuma-mcp-server
 
 ## Run SSE
 
+create .env
+
+```bash
+KUMA_URL=url
+KUMA_USERNAME=username
+KUMA_PASSWORD=pass
+FASTMCP_HOST=0.0.0.0
+FASTMCP_HOST=8000
+```
+
 ```python
 # run_sse.py
 
